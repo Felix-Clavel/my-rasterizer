@@ -1,11 +1,11 @@
-#include "math/Vecteur.hpp"
+#include "math/Vec3.hpp"
 
 class Camera {
     private:
-        Vecteur position;
-        Vecteur lookat;
-        Vecteur up;
-        Vecteur right;
+        Vec3 position;
+        Vec3 lookat;
+        Vec3 up;
+        Vec3 right;
 
         float nearPlane;
         float farPlane;
@@ -14,4 +14,8 @@ class Camera {
 
     public:
         Camera(); // TODO: implement
+        
+
+        
+
 };
