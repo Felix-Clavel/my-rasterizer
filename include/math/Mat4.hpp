@@ -32,4 +32,36 @@ class Mat4 {
             return result;
         }
 
+
+        float operator()(int row, int col) const {
+            return elements[row * 4 + col];
+        }
+        // TODO capter la diff
+        float& operator()(int row, int col) {
+            return elements[row * 4 + col];
+        }
+
+
+        Mat4 operator*(const Mat4& other) const {
+            Mat4 result;
+            result.elements.fill(0.0f);
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    for (int k = 0; k < 4; ++k) {
+                        result(i, j) += (*this)(i, k) * other(k, j);
+                    }
+                }
+            }
+            return result;
+        }
+
+        Vec4 operator*(const Vec4& vec) const {
+            Vec4 result;
+            result.setX((*this)(0,0) * vec.getX() + (*this)(0,1) * vec.getY() + (*this)(0,2) * vec.getZ() + (*this)(0,3) * vec.getW());
+            result.setY((*this)(1,0) * vec.getX() + (*this)(1,1) * vec.getY() + (*this)(1,2) * vec.getZ() + (*this)(1,3) * vec.getW());
+            result.setZ((*this)(2,0) * vec.getX() + (*this)(2,1) * vec.getY() + (*this)(2,2) * vec.getZ() + (*this)(2,3) * vec.getW());
+            result.setW((*this)(3,0) * vec.getX() + (*this)(3,1) * vec.getY() + (*this)(3,2) * vec.getZ() + (*this)(3,3) * vec.getW());
+            return result;
+        }
+
 };
