@@ -11,6 +11,8 @@ class ReadObj {
     private:
         std::vector<Vec3> vertices;
         std::vector<std::array<int, 3>> faces;
+        std::vector<std::array<int, 3>> texIdx;
+        std::vector<std::array<int, 3>> normIdx;
 
 
     public:
@@ -41,27 +43,43 @@ class ReadObj {
                     iss >> x >> y >> z;
                     vertices.push_back(Vec3(x, y, z));
                 } else if (prefix == "f") {
-                    std::vector<int> indices;
+                    std::vector<int> vIdx, tIdx, nIdx;
                     std::string token;
 
                     while (iss >> token) {
-                        std::istringstream faceStream(token);
-                        int idx;
-                        char slash;
-                        faceStream >> idx; // Read vertex index
-                        indices.push_back(idx - 1); // OBJ indices are 1-based so we have to go 0-based
-                        // if needed, we can also read texture and normal indices here
+                        int vi = -1, ti = -1, ni = -1;
+                        size_t firstSlash = token.find('/');
+                        size_t secondSlash = token.find('/', firstSlash + 1);
+
+                        if (firstSlash == std::string::npos) {
+                            vi = std::stoi(token) - 1;
+                        } else if (secondSlash == std::string::npos) {
+                            // v/t
+                            vi = std::stoi(token.substr(0, firstSlash)) - 1;
+                            ti = std::stoi(token.substr(firstSlash + 1)) - 1;
+                        } else {
+                            // v/t/n or v//n
+                            vi = std::stoi(token.substr(0, firstSlash)) - 1;
+                            if (secondSlash > firstSlash + 1) {
+                                ti = std::stoi(token.substr(firstSlash + 1, secondSlash - firstSlash - 1)) - 1;
+                            }
+                            ni = std::stoi(token.substr(secondSlash + 1)) - 1;
+                        }
+                        vIdx.push_back(vi);
+                        tIdx.push_back(ti);
+                        nIdx.push_back(ni);
                     }
 
-                    for (size_t i = 1; i + 1 < indices.size(); ++i) {
-                        faces.push_back({indices[0], indices[i], indices[i + 1]});
+                    for (size_t i = 1; i + 1 < vIdx.size(); ++i) {
+                        faces.push_back({vIdx[0], vIdx[i], vIdx[i + 1]});
+                        texIdx.push_back({tIdx[0], tIdx[i], tIdx[i + 1]});
+                        normIdx.push_back({nIdx[0], nIdx[i], nIdx[i + 1]});
                     }
                 }
-            }
 
             file.close();
             return true;
+            }
         }
-    
     
 };
